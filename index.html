@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador de Times de Vôlei</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Times de Vôlei">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/100/7749f8/volleyball.png">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <style>
+    html, body {
+      background: linear-gradient(135deg, #e0e7ff 0%, #fdf6fd 100%);
+      margin:0; padding:0;
+      min-height: 100dvh;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #22223b;
+      overscroll-behavior-y: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    #root { min-height: 100dvh; }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      padding-bottom: 40px;
+    }
+    .p-4 { padding: 1.5rem 1rem 1rem 1rem; }
+    .space-y-4 > * + * { margin-top: 1.5rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .rounded-lg { border-radius: 1rem; }
+    .rounded { border-radius: 0.75rem; }
+    .rounded-md { border-radius: 0.5rem; }
+    .border { border: 1px solid #e5e7eb; }
+    .p-2 { padding: 0.9rem 1rem; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .gap-2 > * + * { margin-top: 0.9rem; }
+    .gap-4 > * + * { margin-top: 1.5rem; }
+    .items-end { align-items: flex-end; }
+    .mb-2 { margin-bottom: 0.8rem; }
+    .mt-4 { margin-top: 1.2rem; }
+    .mt-6 { margin-top: 1.6rem; }
+    .w-full { width:100%; }
+    .text-xl { font-size: 1.65rem; }
+    .text-lg { font-size: 1.16rem; }
+    .text-base { font-size: 1.08rem; }
+    .text-center { text-align: center; }
+    .text-gray { color:#64748b; }
+    .text-primary { color: #7749f8; }
+    .list-disc { list-style-type: disc; }
+    .list-inside { padding-left: 1em; }
+    .col-title {
+      font-weight: 700;
+      margin-bottom: 0.45rem;
+      text-align: center;
+      color: #7749f8;
+      letter-spacing: .01em;
+      font-size: 1.1rem;
+      background: #f5f3ff;
+      border-radius: 0.7rem;
+      padding: 0.18rem 0;
+    }
+    .ordem-num {
+      display: inline-block;
+      min-width: 1.7em;
+      text-align: right;
+      color: #7749f8;
+      font-weight: bold;
+      font-size: 1.11em;
+      letter-spacing: .01em;
+    }
+    .card {
+      background: #f9f8fe;
+      border-radius: 1rem;
+      box-shadow: 0 2px 18px #d6d6e71a, 0 1.5px 2.5px #d6d6e722;
+      margin-bottom: 1rem;
+      border: 1.5px solid #e0e7ff;
+      transition: box-shadow 0.17s;
+    }
+    /* Estilos compactos para visualização móvel */
+    .card-content { padding: 0.8rem 1rem; }
+    .teams-table { display: flex; gap:0.6rem; overflow-x:auto; padding-bottom:0.4rem; margin-bottom: 0.2rem;}
+    .teams-cell { background: #fff; border-radius: 0.8rem; box-shadow: 0 2px 8px #d6d6e733; padding: 0.6rem 0.8rem; min-width: 150px; font-size:0.95rem; margin-bottom: 0.6rem; border: 1.5px solid #e0e7ff;}
+    .teams-header { font-weight: 700; color: #7749f8; text-align: center; font-size: 1.05em; margin-bottom: 0.2rem; letter-spacing: .01em;}
+    .button, .button-secondary {
+      background: linear-gradient(90deg,#7749f8 10%,#ad63f6 100%);
+      color: #fff;
+      border: none;
+      padding: 1rem 1.2rem;
+      border-radius: 0.8rem;
+      font-size: 1.17rem;
+      font-weight: 600;
+      letter-spacing: 0.015em;
+      margin-top: 0.2rem;
+      width: 100%;
+      box-shadow: 0 2px 8px #b794f41a;
+      transition: background 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      outline:none;
+      border-bottom: 2.5px solid #d6bcfa;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .button:active { background: #5f3dcc; }
+    .button-secondary {
+      background: #fff;
+      color: #7749f8;
+      border: 1.2px solid #d6bcfa;
+      border-bottom: 2.5px solid #d6bcfa;
+      font-weight: 600;
+    }
+    .button-secondary:active { background: #f5f3ff;}
+    .button-disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-bottom: 2.5px solid #e0e7ff;
+    }
+    input, select {
+      font-size: 1.13rem;
+      padding: 1.05rem 1.1rem;
+      border: 1.5px solid #e0e7ff;
+      border-radius: 0.7rem;
+      margin-bottom: 0.45rem;
+      width: 100%;
+      background: #f8fafc;
+      outline: none;
+      box-sizing: border-box;
+      transition: border 0.17s;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    input:focus, select:focus { border: 1.5px solid #7749f8; }
+    input[type=checkbox] { width:1.35em; height:1.35em; margin:0 0.6em 0 0; accent-color: #7749f8;}
+    .grid-posicoes { display: grid; grid-template-columns: 1fr; gap: 1.2rem;}
+    @media (min-width: 500px) { .grid-posicoes { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 900px) { .grid-posicoes { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+    label { cursor:pointer; font-size:1.08rem; line-height:1.5; background: #fff; border-radius: 0.6rem; padding: 0.25rem 0.4rem; margin-bottom: 0.2rem; display: flex; align-items: center; transition: background 0.12s;}
+    label:active { background: #f3e8ff; }
+    ::-webkit-scrollbar {height:7px; background: #f5f3ff; border-radius:6px;}
+    ::-webkit-scrollbar-thumb {background: #d6bcfa; border-radius:6px;}
+    .player-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .player-select {
+        flex-grow: 1;
+        margin-left: 0.5rem;
+    }
+    .player-select-initials {
+        width: 40px;
+        flex-shrink: 0;
+        text-align: center;
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
+        margin-left: 0.5rem;
+    }
+    @media (max-width: 600px) { .container { padding-bottom: 80px;}
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    function Button({ children, variant, ...props }) {
+      let className = "button";
+      if (variant === "secondary") className = "button-secondary";
+      if (props.disabled) className += " button-disabled";
+      return <button className={className} {...props}>{children}</button>;
+    }
+
+    function Card({ children }) {
+      return <div className="card">{children}</div>;
+    }
+    function CardContent({ children, className }) {
+      return <div className={"card-content " + (className || "")}>{children}</div>;
+    }
+
+    const POSICOES = ["Levantadora", "Oposta", "Central", "Ponteira"];
+
+    const ATLETAS_FIXAS = [
+      { id: 1, nome: "ADRIANA", posicao: "Levantadora" },
+      { id: 2, nome: "ALEXANDRA", posicao: "Oposta" },
+      { id: 3, nome: "ERIKA BABINI", posicao: "Levantadora" },
+      { id: 4, nome: "ANGELICA", posicao: "Oposta" },
+      { id: 5, nome: "ANINHA LIMA", posicao: "Levantadora" },
+      { id: 6, nome: "BETH", posicao: "Ponteira" },
+      { id: 7, nome: "DÉA", posicao: "Central" },
+      { id: 8, nome: "ELAYNE", posicao: "Central" },
+      { id: 9, nome: "ERIKA - MAMÃE", posicao: "Central" },
+      { id: 10, nome: "FLAVINHA", posicao: "Central" },
+      { id: 11, nome: "GIMENNA", posicao: "Central" },
+      { id: 12, nome: "IALE", posicao: "Levantadora" },
+      { id: 13, nome: "IVANA", posicao: "Central" },
+      { id: 14, nome: "JAPA", posicao: "Central" },
+      { id: 15, nome: "JÔ", posicao: "Ponteira" },
+      { id: 16, nome: "JOSELMA", posicao: "Oposta" },
+      { id: 17, nome: "JULIETE", posicao: "Central" },
+      { id: 18, nome: "MARCLEIDE", posicao: "Oposta" },
+      { id: 19, nome: "MARLEIDE", posicao: "Ponteira" },
+      { id: 20, nome: "MAYSA", posicao: "Ponteira" },
+      { id: 21, nome: "MILENA", posicao: "Central" },
+      { id: 22, nome: "MIRA", posicao: "Ponteira" },
+      { id: 23, nome: "ROSÁRIO", posicao: "Ponteira" },
+      { id: 24, nome: "SUZY", posicao: "Ponteira" },
+      { id: 25, nome: "VALÉRIA", posicao: "Ponteira" },
+      { id: 26, nome: "WALESKA", posicao: "Ponteira" },
+      { id: 27, nome: "WISLA", posicao: "Ponteira" },
+      { id: 28, nome: "JULIANA", posicao: "Oposta" },
+      { id: 29, nome: "C_CONVIDADA", posicao: "Central" },
+      { id: 30, nome: "O_CONVIDADA", posicao: "Oposta" },
+      { id: 31, nome: "L_CONVIDADA", posicao: "Levantadora" },
+      { id: 32, nome: "ELIZABETH", posicao: "Ponteira" },
+      { id: 33, nome: "P_CONVIDADA", posicao: "Ponteira" }
+    ];
+
+    function VoleiApp() {
+      const getInitialState = (key, defaultValue) => {
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : defaultValue;
+      };
+
+      const [atletas, setAtletas] = React.useState(() =>
+        getInitialState('atletas', ATLETAS_FIXAS.map(a => ({...a, jogos: 0})))
+      );
+      const [presentes, setPresentes] = React.useState(() => getInitialState('presentes', []));
+      const [ordem, setOrdem] = React.useState(() => getInitialState('ordem', []));
+      const [times, setTimes] = React.useState([]);
+      const [historicoPartidas, setHistoricoPartidas] = React.useState(() => getInitialState('historicoPartidas', []));
+      const [ultimoTimeGerado, setUltimoTimeGerado] = React.useState(null);
+
+      React.useEffect(() => {
+        localStorage.setItem('atletas', JSON.stringify(atletas));
+      }, [atletas]);
+
+      React.useEffect(() => {
+        localStorage.setItem('presentes', JSON.stringify(presentes));
+      }, [presentes]);
+
+      React.useEffect(() => {
+        localStorage.setItem('ordem', JSON.stringify(ordem));
+      }, [ordem]);
+
+      React.useEffect(() => {
+        localStorage.setItem('historicoPartidas', JSON.stringify(historicoPartidas));
+      }, [historicoPartidas]);
+
+      React.useEffect(() => {
+        const handleBeforeUnload = (event) => {
+          if (presentes.length > 0) {
+            event.preventDefault();
+            event.returnValue = '';
+          }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+      }, [presentes]);
+
+      const marcarPresenca = (id) => {
+        if (!presentes.includes(id)) {
+          setPresentes([...presentes, id]);
+          setOrdem([...ordem.filter((oid) => oid !== id), id]);
+        } else {
+          setPresentes(presentes.filter((pid) => pid !== id));
+          setOrdem(ordem.filter((oid) => oid !== id));
+        }
+      };
+
+      const alterarPosicao = (id, novaPosicao) => {
+          setAtletas(atletas.map(a =>
+              a.id === id ? { ...a, posicao: novaPosicao } : a
+          ));
+      };
+      
+      const gerarTimes = () => {
+        const selecionadas = ordem
+          .map((id) => atletas.find((j) => j.id === id && presentes.includes(id)))
+          .filter(Boolean);
+
+        const ordenadas = [...selecionadas].sort((a, b) => {
+          if (a.jogos !== b.jogos) return a.jogos - b.jogos;
+          return ordem.indexOf(a.id) - ordem.indexOf(b.id);
+        });
+
+        const selecionarPorPosicao = (lista, posicao, quantidade) => {
+          return lista.filter((j) => j.posicao === posicao).slice(0, quantidade);
+        };
+
+        const time1 = [];
+        const time2 = [];
+
+        const montarTime = (candidatas) => [
+          ...selecionarPorPosicao(candidatas, "Levantadora", 1),
+          ...selecionarPorPosicao(candidatas, "Ponteira", 2),
+          ...selecionarPorPosicao(candidatas, "Central", 2),
+          ...selecionarPorPosicao(candidatas, "Oposta", 1),
+        ];
+
+        time1.push(...montarTime(ordenadas));
+        const idsTime1 = time1.map((j) => j && j.id);
+        const restantes = ordenadas.filter((j) => !idsTime1.includes(j.id));
+
+        time2.push(...montarTime(restantes));
+
+        const novosAtletas = atletas.map(a => {
+          if ([...time1, ...time2].some(j => j && j.id === a.id)) {
+            return { ...a, jogos: a.jogos + 1 };
+          }
+          return a;
+        });
+
+        const novaPartida = { time1: time1, time2: time2, data: new Date().toLocaleString() };
+
+        setAtletas(novosAtletas);
+        setTimes([time1, time2]);
+        setHistoricoPartidas([...historicoPartidas, novaPartida]);
+        setUltimoTimeGerado([time1.map(j => j?.id), time2.map(j => j?.id)]);
+      };
+
+      const desfazerGeracao = () => {
+        if (!ultimoTimeGerado) return;
+
+        const [idsTime1, idsTime2] = ultimoTimeGerado;
+        const idsUltimaGeracao = [...idsTime1, ...idsTime2].filter(Boolean);
+
+        const atletasAtualizados = atletas.map(a => {
+            if (idsUltimaGeracao.includes(a.id)) {
+                return { ...a, jogos: a.jogos - 1 };
+            }
+            return a;
+        });
+
+        setAtletas(atletasAtualizados);
+        setHistoricoPartidas(historicoPartidas.slice(0, -1));
+        setTimes([]);
+        setUltimoTimeGerado(null);
+      };
+
+      const limparPresencas = () => {
+        setPresentes([]);
+        setOrdem([]);
+        setTimes([]);
+        setHistoricoPartidas([]);
+        setAtletas(ATLETAS_FIXAS.map(a => ({...a, jogos: 0})));
+        setUltimoTimeGerado(null);
+
+        localStorage.removeItem('presentes');
+        localStorage.removeItem('ordem');
+        localStorage.removeItem('atletas');
+        localStorage.removeItem('historicoPartidas');
+      };
+
+      const atletasPorPosicao = POSICOES.reduce((acc, pos) => {
+        const sortedAtletas = atletas.filter(a => a.posicao === pos).sort((a, b) => a.nome.localeCompare(b.nome));
+        acc[pos] = sortedAtletas;
+        return acc;
+      }, {});
+
+      function ordemStr(jogadoraId) {
+        const idx = ordem.indexOf(jogadoraId);
+        return presentes.includes(jogadoraId) ? (idx + 1) : "";
+      }
+
+      return (
+        <div className="container p-4 space-y-4" style={{WebkitUserSelect:'none',userSelect:'none'}}>
+          <h1 className="text-xl font-bold text-center" style={{color:'#7749f8'}}>Gerador de Times de Vôlei</h1>
+
+          {/* Lista de presença por posição */}
+          <div>
+            <h2 className="font-semibold text-lg text-center mb-2">Lista de Presença</h2>
+            <div className="grid-posicoes">
+              {POSICOES.map(pos => (
+                <div key={pos}>
+                  <div className="col-title">{pos}</div>
+                  {atletasPorPosicao[pos].length === 0 && (
+                    <div style={{ color: "#bbb", textAlign: "center" }}>Nenhuma</div>
+                  )}
+                  {atletasPorPosicao[pos].map((j) => (
+                    <label key={j.id} style={{ marginBottom: 4 }}>
+                      <div className="player-details">
+                        <input
+                          type="checkbox"
+                          checked={presentes.includes(j.id)}
+                          onChange={() => marcarPresenca(j.id)}
+                        />
+                        <span>
+                          {presentes.includes(j.id) && (
+                            <span className="ordem-num">{ordemStr(j.id)}.</span>
+                          )}
+                          {j.nome}
+                        </span>
+                        <select
+                            className="player-select-initials"
+                            value={j.posicao}
+                            onChange={(e) => alterarPosicao(j.id, e.target.value)}
+                        >
+                            {POSICOES.map(p => (
+                                <option key={p} value={p}>{p.charAt(0)}</option>
+                            ))}
+                        </select>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 flex-wrap" style={{maxWidth:540, margin:'0 auto'}}>
+            <Button onClick={gerarTimes}>Gerar Times</Button>
+            {times.length > 0 && <Button variant="secondary" onClick={desfazerGeracao}>Desfazer Geração</Button>}
+            <Button variant="secondary" onClick={limparPresencas}>Finalizar</Button>
+          </div>
+
+          {times.length > 0 && (
+            <div className="space-y-4 mt-4">
+              <div className="teams-table">
+                <div>
+                  <div className="teams-header">Time 1</div>
+                  <div className="teams-cell">
+                    {times[0].map((j, idx) =>
+                      j ? (
+                        <div key={j.id}>
+                          {j.nome} - {j.posicao}
+                        </div>
+                      ) : null
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="teams-header">Time 2</div>
+                  <div className="teams-cell">
+                    {times[1].map((j, idx) =>
+                      j ? (
+                        <div key={j.id}>
+                          {j.nome} - {j.posicao}
+                        </div>
+                      ) : null
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="mt-6">
+                <h2 className="font-semibold text-lg">Estatísticas de Participação</h2>
+                <ul className="list-disc list-inside">
+                  {[...atletas]
+                    .filter((j) => j.jogos > 0)
+                    .sort((a, b) => a.nome.localeCompare(b.nome))
+                    .map((j) => (
+                      <li key={j.id}>
+                        {j.nome} - Jogos: {j.jogos}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+
+          {historicoPartidas.length > 0 && (
+            <div className="space-y-4 mt-4">
+              <h2 className="font-semibold text-lg text-center mb-2">Histórico de Partidas</h2>
+              {historicoPartidas.map((partida, index) => (
+                <div key={index} className="card">
+                  <CardContent>
+                    <div className="font-semibold text-base mb-2">Partida {index + 1} - {partida.data}</div>
+                    <div className="teams-table">
+                        <div>
+                          <div className="teams-header">Time 1</div>
+                          <div className="teams-cell">
+                            {partida.time1.map((j) =>
+                              j ? (
+                                <div key={j.id}>
+                                  {j.nome} - {j.posicao} (Jogos: {j.jogos})
+                                </div>
+                              ) : null
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="teams-header">Time 2</div>
+                          <div className="teams-cell">
+                            {partida.time2.map((j) =>
+                              j ? (
+                                <div key={j.id}>
+                                  {j.nome} - {j.posicao} (Jogos: {j.jogos})
+                                </div>
+                              ) : null
+                            )}
+                          </div>
+                        </div>
+                    </div>
+                  </CardContent>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<VoleiApp />);
+  </script>
+</body>
+</html>
